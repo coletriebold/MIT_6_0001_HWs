@@ -115,25 +115,31 @@ def get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
         current_paths = []
         node = start
         current_paths.append(node)
-    
-    avail_nodes = digraph.get_edges_for_node(node)
-    print(avail_nodes)
+    else:
+        node = start
+        current_paths = path
+    avail_edges = digraph.get_edges_for_node(node)
     i = 0
-    for ea_path in avail_nodes:
+    for ea_path in avail_edges:
         destination = ea_path.get_destination()
         i += 1
         if destination not in current_paths:
             current_paths.append(destination)
-            print(current_paths)
+            #print(current_paths)
             max_dist_outdoors += ea_path.get_outdoor_distance()
             
             if destination == end:
                 if best_dist > max_dist_outdoors:
-                    best_dist = max_dist_outdoors + ea_path.get_outdoor_distance()
-            return get_best_path(digraph, ea_path, end, current_paths, max_dist_outdoors, best_dist, best_path)
-            break
-        elif current_paths.index(path) != 0:
-            return get_best_path(digraph, current_paths.index(path)-1, end, max_dist_outdoors, best_dist, best_path)
+                    best_dist = max_dist_outdoors
+                    return best_dist
+                    break
+            else:
+                get_best_path(digraph, destination, end, current_paths, max_dist_outdoors, best_dist, best_path)
+        
+        elif (current_paths.index(start)-1) in current_paths:
+            get_best_path(digraph, current_paths.index(start)-1, current_paths, end, max_dist_outdoors, best_dist, best_path)
+        else:
+            return None
             
 
 
