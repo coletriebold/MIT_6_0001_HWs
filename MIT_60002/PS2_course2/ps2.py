@@ -111,36 +111,65 @@ def get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
         If there exists no path that satisfies max_total_dist and
         max_dist_outdoors constraints, then return None.
     """
+    best_dist_inside = None
     if len(path) < 1:
         current_paths = []
         node = start
         current_paths.append(node)
+        path_dist = 0
     else:
         node = start
         current_paths = path
+    
     avail_edges = digraph.get_edges_for_node(node)
     i = 0
     for ea_path in avail_edges:
         destination = ea_path.get_destination()
-        i += 1
         if destination not in current_paths:
             current_paths.append(destination)
             #print(current_paths)
-            max_dist_outdoors += ea_path.get_outdoor_distance()
-            
-            if destination == end:
-                if best_dist > max_dist_outdoors:
-                    best_dist = max_dist_outdoors
-                    return best_dist
-                    break
-            else:
-                get_best_path(digraph, destination, end, current_paths, max_dist_outdoors, best_dist, best_path)
-        
-        elif (current_paths.index(start)-1) in current_paths:
-            get_best_path(digraph, current_paths.index(start)-1, current_paths, end, max_dist_outdoors, best_dist, best_path)
+            #path_dist += ea_path.get_outdoor_distance()
+            i = 1
+            break
+        elif destination != current_paths[current_paths.index(start)+1]:
+            current_paths = current_paths[:(current_paths.index(start)+1)]
+            current_paths.append(destination)
+    
+    path_dist = 0
+    for k in range(1,len(current_paths)):
+        last_edge = digraph.get_edges_for_node(current_paths[k-1])
+        for j in last_edge:
+            if j.get_destination() == current_paths[k]:
+                edge_len = j.get_outdoor_distance()
+                break
+        path_dist += edge_len
+    print("path: {}".format(path_dist))
+    
+    if i == 0:
+        if (current_paths.index(start)-1) >= 0:
+            current_paths.pop(len(current_paths)-1)
+            [best_dist_inside, current_paths_inside] = get_best_path(digraph, current_paths[current_paths.index(start)-1], end, current_paths, max_dist_outdoors, best_dist, best_path)
+    #Deciding whether or not to continue recursion, and if so, how
+    elif destination == end:
+        if path_dist < max_dist_outdoors:
+            best_dist = path_dist
+            [best_dist_inside, current_paths_inside] = get_best_path(digraph, current_paths[current_paths.index(start)-1], end, current_paths, max_dist_outdoors, best_dist, best_path)
+    elif i == 1:
+        [best_dist_inside, current_paths_inside] = get_best_path(digraph, destination, end, current_paths, max_dist_outdoors, best_dist, best_path)
+    else:
+        return (None, None)
+    
+    print("best: {}".format(best_dist))
+    #comparing values
+    if best_dist and best_dist_inside:
+        if best_dist < best_dist_inside:
+            return (best_dist, current_paths)
         else:
-            return None
-            
+            return (best_dist_inside, current_paths_inside)
+    elif best_dist:
+        return (best_dist, current_paths)
+    else:
+        return (best_dist_inside, current_paths_inside)
 
 
 # Problem 3c: Implement directed_dfs
