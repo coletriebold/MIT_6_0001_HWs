@@ -125,17 +125,28 @@ def get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
     i = 0
     for ea_path in avail_edges:
         destination = ea_path.get_destination()
-        if destination not in current_paths:
+        if (destination not in current_paths) and (start != end):
             current_paths.append(destination)
             #print(current_paths)
             #path_dist += ea_path.get_outdoor_distance()
             i = 1
             break
+        elif start == end:
+            i = 2
+            break
         elif destination != current_paths[current_paths.index(start)+1]:
             current_paths = current_paths[:(current_paths.index(start)+1)]
             current_paths.append(destination)
-    
+            i = 1
+            break
+    if len(avail_edges) == 0:
+        if start == end:
+            i = 2
+        else:
+            i = 0
+        
     path_dist = 0
+    print(current_paths)
     for k in range(1,len(current_paths)):
         last_edge = digraph.get_edges_for_node(current_paths[k-1])
         for j in last_edge:
@@ -143,23 +154,26 @@ def get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
                 edge_len = j.get_outdoor_distance()
                 break
         path_dist += edge_len
-    print("path: {}".format(path_dist))
     
     if i == 0:
+        print("this triggered1")
         if (current_paths.index(start)-1) >= 0:
-            current_paths.pop(len(current_paths)-1)
-            [best_dist_inside, current_paths_inside] = get_best_path(digraph, current_paths[current_paths.index(start)-1], end, current_paths, max_dist_outdoors, best_dist, best_path)
+            new_start = current_paths[current_paths.index(start)-1]
+            #current_paths.pop(len(current_paths)-1)
+            [best_dist_inside, current_paths_inside] = get_best_path(digraph, new_start, end, current_paths, max_dist_outdoors, best_dist, best_path)
+    
     #Deciding whether or not to continue recursion, and if so, how
-    elif destination == end:
-        if path_dist < max_dist_outdoors:
+    elif i != 2:
+        print("this triggered 2")
+        if (destination == end) and (path_dist < max_dist_outdoors):
             best_dist = path_dist
             [best_dist_inside, current_paths_inside] = get_best_path(digraph, current_paths[current_paths.index(start)-1], end, current_paths, max_dist_outdoors, best_dist, best_path)
-    elif i == 1:
-        [best_dist_inside, current_paths_inside] = get_best_path(digraph, destination, end, current_paths, max_dist_outdoors, best_dist, best_path)
+        elif i == 1:
+            print("this triggered 3")
+            [best_dist_inside, current_paths_inside] = get_best_path(digraph, destination, end, current_paths, max_dist_outdoors, best_dist, best_path)
     else:
+        
         return (None, None)
-    
-    print("best: {}".format(best_dist))
     #comparing values
     if best_dist and best_dist_inside:
         if best_dist < best_dist_inside:

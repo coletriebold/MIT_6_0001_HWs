@@ -14,21 +14,26 @@ digraph = Digraph()
 na = Node('a')
 nb = Node('b')
 nc = Node('c')
+nd = Node('d')
 
 digraph.add_node(na)
 digraph.add_node(nb)
 digraph.add_node(nc)
+digraph.add_node(nd)
 
 e1 = WeightedEdge(na, nb, 15, 10)
-e2 = WeightedEdge(na, nc, 14, 6)
+e2 = WeightedEdge(na, nc, 14, 16)
 e3 = WeightedEdge(nb, nc, 3, 1)
+e4 = WeightedEdge(nb, nd, 3, 10)
 
 digraph.add_edge(e1)
 digraph.add_edge(e2)
 digraph.add_edge(e3)
+digraph.add_edge(e4)
+
 
 start = na
-end = nc
+end = nd
 max_dist_outdoors = 100
 path = []
 best_dist = 9999
