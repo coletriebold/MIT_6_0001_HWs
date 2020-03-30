@@ -1,0 +1,1 @@
+These are problem sets from MIT online coursework. I am uploading them to github to help me track my progress as well as practice for getting used to github. I plan on uploading code through the next few months in order to work on my coding skills. This will start off as problem sets and transition into actual projects
